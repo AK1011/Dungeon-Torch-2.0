@@ -20,15 +20,51 @@
       float: left;
       margin: 10;
    }
+   .panel-form {
+      float: left;
+      margin: 15;
+   }
+   .input-label {
+      font-size: 18;
+      color: white;
+      float: left;
+      margin-right: 10;
+      width: 50;
+   }
+   .board {
+      width: 600;
+      height: 600;
+      float: left;
+   }
+   .panel-text-input {
+      float: left;
+      width: 100;
+   }
 </style>
 
 <!-- The Canvas -->
-<canvas id="canvas" width="600" height="600" style="float: left"></canvas>
+<canvas id="canvas" class="board" width="600" height="600"></canvas>
 <div id="panel" class="panel" width="198" height="600">
    <span class="colour-picker" colour="green"></span>
    <span class="colour-picker" colour="grey"></span>
    <span class="colour-picker" colour="blue"></span>
    <span class="colour-picker" colour="red"></span>
+   <span class="colour-picker" colour="orange"></span>
+   <span class="colour-picker" colour="purple"></span>
+   <span class="colour-picker" colour="yellow"></span>
+   <span class="colour-picker" colour="white"></span>
+   <span class="colour-picker" colour="#806517"></span>
+   <span class="colour-picker" colour="black"></span>
+   <span class="colour-picker" colour="#444"></span>
+   <span class="colour-picker" colour="#966F33"></span>
+   
+   <form class="panel-form">
+      <span class="input-label">Width</span>
+      <input class="panel-text-input" type="text" name="width" value="10"></input>
+      <span class="input-label">Height</span>
+      <input class="panel-text-input" type="text" name="height" value="10"></input>
+      <input id="reset-grid" type="button" value="Reset Grid"></input>
+   </form>
 </div>
 
 <script>
@@ -38,10 +74,9 @@
 		var width = $("#canvas").width();
 		var height = $("#canvas").height();
 		
-		var grass_colour = 'green';
-		var stone_colour = 'grey';
-		var square_border_colour = '#000000';
-      var grid_size = 8;
+		var square_border_colour = "black";
+      var grid_x;
+      var grid_y;
 		var board = [[]];
       var currentColour;
       
@@ -52,7 +87,7 @@
 		$("#canvas").mousedown(function(e) {
 			var dx = e.pageX - this.offsetLeft;
 			var dy = e.pageY - this.offsetTop;
-			paintColour(dx, dy, $(currentColour).attr("colour"));
+			paintColour(dx, dy, getCurrentColour());
          mouseisdown = true;
 		});
       
@@ -66,7 +101,7 @@
 			var dx = e.pageX - this.offsetLeft;
 			var dy = e.pageY - this.offsetTop;
 			if (mouseisdown) {
-            paintColour(dx, dy, $(currentColour).attr("colour"));
+            paintColour(dx, dy, getCurrentColour());
          }
 		});
       
@@ -74,10 +109,11 @@
       
       function defaultBoard() {
          // set up 2d array for board
-			for(i = 0; i < grid_size; i++){
+         board = [[]];
+			for(i = 0; i < grid_x; i++){
 				board.push([]);
-				for (j = 0; j < grid_size; j++) {
-					board[i].push(stone_colour);
+				for (j = 0; j < grid_y; j++) {
+					board[i].push(getCurrentColour());
 				}
 			}
       }
@@ -89,18 +125,18 @@
 		}
       
       function paintColour(x, y, colour) {
-			board[parseInt(x / width * grid_size, 10)][parseInt(y / height * grid_size, 10)] = colour;
+			board[parseInt(x / width * grid_x, 10)][parseInt(y / height * grid_y, 10)] = colour;
 			paint();
 		}
 
 		function paint_board() {
-			for (x = 0; x < grid_size; x++) {
-				for (y = 0; y < grid_size; y++) {
+			for (x = 0; x < grid_x; x++) {
+				for (y = 0; y < grid_y; y++) {
 					context.fillStyle = board[x][y];
-					context.fillRect(x * width / grid_size, y * height / grid_size, width / grid_size, height / grid_size);
+					context.fillRect(x * width / grid_x, y * height / grid_y, width / grid_x, height / grid_y);
                   
 					context.strokeStyle = square_border_colour;
-					context.strokeRect(x * width / grid_size, y * height / grid_size, width / grid_size, height / grid_size);
+					context.strokeRect(x * width / grid_x, y * height / grid_y, width / grid_x, height / grid_y);
 					context.strokeRect(0, 0, width, height);
 				}
 			}
@@ -133,12 +169,31 @@
           $(colourPicker).css("border-color", "yellow");
       }
       
+      function getCurrentColour() {
+         if (currentColour == null) {
+            return "black";
+         }
+         return $(currentColour).attr("colour");l
+      }
+      
       $(".colour-picker").on("click", function() {
          selectColour($(this));
       });
       
+      function setGridSize() {
+         grid_x = $("input[type='text'][name='width']").attr("value");
+         grid_y = $("input[type='text'][name='height']").attr("value");
+      }
+      
+      $("#reset-grid").on("click", function() {
+         setGridSize();
+         defaultBoard();
+         paint();
+      });
+      
 		// MAIN //
 		
+      setGridSize();
       setColours();
 		defaultBoard();
 		paint();
