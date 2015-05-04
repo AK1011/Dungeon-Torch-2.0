@@ -40,6 +40,16 @@
       float: left;
       width: 100;
    }
+   div.board-list {
+      font-size: 18;
+      color: white;
+      margin: 15;
+   }
+   .load-board-button {
+      list-style-type: none;
+      font-size: 16;
+      color: white;
+   }
 </style>
 
 <!-- The Canvas -->
@@ -59,12 +69,24 @@
    <span class="colour-picker" colour="#966F33"></span>
    
    <form class="panel-form">
-      <span class="input-label">Width</span>
+      <span class="input-label">Width:</span>
       <input class="panel-text-input" type="text" name="width" value="10"></input>
-      <span class="input-label">Height</span>
+      <span class="input-label">Height:</span>
       <input class="panel-text-input" type="text" name="height" value="10"></input>
       <input id="reset-grid" type="button" value="Reset Grid"></input>
    </form>
+   
+   <form class="panel-form">
+      <span class="input-label">Save As:</span>
+      <input id="save-board-name" class="panel-text-input" type="text" name="save"></input>
+      <input id="save-board-button" type="button" value="Save Board"></input>
+   </form>
+   
+   <div class="board-list"> 
+      <span>Board List:</span>
+      <ul id="board-list">
+      </ul>
+   </div>
 </div>
 
 <script>
@@ -190,6 +212,50 @@
          defaultBoard();
          paint();
       });
+      
+      var boardsave = {};
+      
+      $("#save-board-button").on("click", function() {
+         // TODO will make it an ajax request to send to server for save
+         // for now saving as cookies
+         console.log("Saving");
+         //setCookie("test-board", "test", "1");
+         boardsave[$("#save-board-name").attr("value")] = $.extend(true, {}, board);
+         $("#board-list").empty();
+         for (var i in Object.keys(boardsave)) {
+            $("#board-list").append("<li class='load-board-button'>" + Object.keys(boardsave)[i] + "</li>");
+         }
+         addLoadButtonFunctionality();
+      });
+      
+      function addLoadButtonFunctionality() {
+         $(".load-board-button").on("click", function() {
+            if ($(this).text() in boardsave) {
+               board = boardsave[$(this).text()];
+            }
+            paint();
+         });
+      }
+      
+      // COOKIE METHODS //
+      
+      function setCookie(cname, cvalue, exdays) {
+          var d = new Date();
+          d.setTime(d.getTime() + (exdays*24*60*60*1000));
+          var expires = "expires="+d.toUTCString();
+          document.cookie = cname + "=" + cvalue + "; " + expires;
+      }
+      
+      function getCookie(cname) {
+          var name = cname + "=";
+          var ca = document.cookie.split(';');
+          for(var i=0; i<ca.length; i++) {
+              var c = ca[i];
+              while (c.charAt(0)==' ') c = c.substring(1);
+              if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+          }
+          return "";
+      }
       
 		// MAIN //
 		
