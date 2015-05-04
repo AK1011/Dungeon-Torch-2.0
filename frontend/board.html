@@ -1,0 +1,95 @@
+<!-- Jquery -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+
+<!-- The Canvas -->
+<canvas id="canvas" width="600" height="600"></canvas>
+
+<script>
+	$(document).ready(function(){
+		var canvas = $("#canvas")[0];
+		var context = canvas.getContext("2d");
+		var width = $("#canvas").width();
+		var height = $("#canvas").height();
+		
+		var grass_colour = 'green';
+		var stone_colour = 'grey';
+		var square_border_colour = '#000000';
+      var grid_size = 8;
+		var board = [[]];
+      
+		/// *** INPUT CODE *** ///
+      
+      var mouseisdown = false;
+      
+		$("#canvas").mousedown(function(e) {
+			var dx = e.pageX - this.offsetLeft;
+			var dy = e.pageY - this.offsetTop;
+			paintColour(dx, dy, "green");
+         mouseisdown = true;
+		});
+      
+		$("#canvas").mouseup(function(e) {
+			var dx = e.pageX - this.offsetLeft;
+			var dy = e.pageY - this.offsetTop;
+			mouseisdown = false;
+		});
+      
+		$("#canvas").mousemove(function(e) {
+			var dx = e.pageX - this.offsetLeft;
+			var dy = e.pageY - this.offsetTop;
+			if (mouseisdown) {
+            paintColour(dx, dy, "green");
+         }
+		});
+      
+      // SETUP FUNCTIONS //
+      
+      function defaultBoard() {
+         // set up 2d array for board
+			for(i = 0; i < grid_size; i++){
+				board.push([]);
+				for (j = 0; j < grid_size; j++) {
+					board[i].push(stone_colour);
+				}
+			}
+      }
+      
+		// PAINTING FUNCTIONS //
+      
+		function paint() {
+			paint_board();
+		}
+      
+      function paintColour(x, y, colour) {
+			board[parseInt(x / width * grid_size, 10)][parseInt(y / height * grid_size, 10)] = colour;
+			paint();
+		}
+
+		function paint_board() {
+			for (x = 0; x < grid_size; x++) {
+				for (y = 0; y < grid_size; y++) {
+					context.fillStyle = board[x][y];
+					context.fillRect(x * width / grid_size, y * height / grid_size, width / grid_size, height / grid_size);
+                  
+					context.strokeStyle = square_border_colour;
+					context.strokeRect(x * width / grid_size, y * height / grid_size, width / grid_size, height / grid_size);
+					context.strokeRect(0, 0, width, height);
+				}
+			}
+		}
+      
+		// CLASSES //
+      
+		/*function Bishop (team, square) {
+			Piece.call(this, "Bishop", team, square, "b");
+			this.getMoves = function() { bishopMove(this) };
+		}
+		Bishop.prototype = new Piece;*/
+
+		// MAIN //
+		
+		defaultBoard();
+		paint();
+		
+	});
+</script>
