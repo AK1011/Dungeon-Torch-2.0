@@ -1,8 +1,35 @@
 <!-- Jquery -->
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+<style>
+   .panel {
+      float: left;
+      width: 200;
+      height: 600;
+      border-style: solid;
+      border-width: 2px;
+      border-left: none;
+      box-sizing: border-box;
+      background-color: #916C47
+   }
+   .colour-picker {
+      width: 20;
+      height: 20;
+      box-sizing: border-box;
+      border-style: solid;
+      border-width: 1px;
+      float: left;
+      margin: 10;
+   }
+</style>
 
 <!-- The Canvas -->
-<canvas id="canvas" width="600" height="600"></canvas>
+<canvas id="canvas" width="600" height="600" style="float: left"></canvas>
+<div id="panel" class="panel" width="198" height="600">
+   <span class="colour-picker" colour="green"></span>
+   <span class="colour-picker" colour="grey"></span>
+   <span class="colour-picker" colour="blue"></span>
+   <span class="colour-picker" colour="red"></span>
+</div>
 
 <script>
 	$(document).ready(function(){
@@ -16,6 +43,7 @@
 		var square_border_colour = '#000000';
       var grid_size = 8;
 		var board = [[]];
+      var currentColour;
       
 		/// *** INPUT CODE *** ///
       
@@ -24,7 +52,7 @@
 		$("#canvas").mousedown(function(e) {
 			var dx = e.pageX - this.offsetLeft;
 			var dy = e.pageY - this.offsetTop;
-			paintColour(dx, dy, "green");
+			paintColour(dx, dy, $(currentColour).attr("colour"));
          mouseisdown = true;
 		});
       
@@ -38,7 +66,7 @@
 			var dx = e.pageX - this.offsetLeft;
 			var dy = e.pageY - this.offsetTop;
 			if (mouseisdown) {
-            paintColour(dx, dy, "green");
+            paintColour(dx, dy, $(currentColour).attr("colour"));
          }
 		});
       
@@ -86,8 +114,32 @@
 		}
 		Bishop.prototype = new Piece;*/
 
+      // COLOUR PCIKER //
+      
+      function setColours() {
+         $(".colour-picker").each(function() {
+            $(this).css("background-color", $(this).attr("colour"));
+         });
+         selectColour($(".colour-picker").first());
+      }
+      
+      function selectColour(colourPicker) {
+          if (currentColour != null) {
+            $(currentColour).css("border-width", "1");
+            $(currentColour).css("border-color", "black");
+          }
+          currentColour = colourPicker;
+          $(colourPicker).css("border-width", "2");
+          $(colourPicker).css("border-color", "yellow");
+      }
+      
+      $(".colour-picker").on("click", function() {
+         selectColour($(this));
+      });
+      
 		// MAIN //
 		
+      setColours();
 		defaultBoard();
 		paint();
 		
